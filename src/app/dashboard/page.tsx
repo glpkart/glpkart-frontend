@@ -101,7 +101,7 @@ export default function DashboardPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
           {[
             { label: 'Current weight', value: profile ? `${profile.currentWeightKg} kg` : '—', sub: `Started at ${profile?.startWeightKg || '—'} kg` },
-            { label: 'Total lost', value: profile ? `${profile.totalLostKg} kg`, sub: `${lostPct}% of starting weight` : '—' },
+            { label: 'Total lost', value: profile ? `${profile.totalLostKg} kg` : '—', sub: `${lostPct}% of starting weight` },
             { label: 'To goal', value: toGoalKg !== null ? `${toGoalKg} kg` : '—', sub: 'Keep going' },
             { label: 'Week', value: `#${profile?.weekNumber || '—'}`, sub: 'On GLP-1 therapy' },
           ].map((s, i) => (
