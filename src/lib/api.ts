@@ -1,12 +1,9 @@
 import axios from 'axios'
 
-// NEXT_PUBLIC_API_URL must be set in Vercel environment variables
-// It must be the HTTPS Railway URL e.g. https://glpkart-backend.up.railway.app
-const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
-
-if (!API_URL && typeof window !== 'undefined') {
-  console.error('NEXT_PUBLIC_API_URL is not set. Login will not work.')
-}
+// All API calls go to /api/backend/* on the same domain (glpkart.com)
+// Next.js rewrites these server-side to the Railway backend
+// This completely avoids mixed content and CORS issues
+const API_URL = '/api/backend'
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -23,22 +20,20 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Auth helpers
+// Auth
 export const authApi = {
   sendOtp: (phone: string) => api.post('/auth/otp/send', { phone }),
   verifyOtp: (phone: string, code: string) => api.post('/auth/otp/verify', { phone, code }),
   logout: () => api.post('/auth/logout'),
 }
 
-// Journey helpers
+// Journey
 export const journeyApi = {
   getDashboard: () => api.get('/journey/dashboard'),
   logWeight: (weightKg: number) => api.post('/journey/weight', { weightKg }),
-  logInjection: (data: { medicineName: string; doseMg: number; injectionSite: string; dueAt: string }) =>
-    api.post('/journey/injection', data),
 }
 
-// Consultation helpers
+// Consultations
 export const consultApi = {
   getSlots: (doctorId: string, date: string) =>
     api.get(`/consultations/slots/${doctorId}?date=${date}`),
@@ -47,12 +42,12 @@ export const consultApi = {
   getAll: () => api.get('/consultations'),
 }
 
-// Prescription helpers
+// Prescriptions
 export const prescriptionApi = {
   getAll: () => api.get('/prescriptions'),
 }
 
-// Forum helpers
+// Forum
 export const forumApi = {
   getPosts: (topic?: string, cursor?: string) =>
     api.get('/forum/posts', { params: { topic, cursor, limit: 20 } }),
@@ -63,4 +58,9 @@ export const forumApi = {
     api.post(`/forum/posts/${postId}/reply`, { body }),
   markHelpful: (postId: string) => api.post(`/forum/posts/${postId}/helpful`),
   flag: (postId: string, reason: string) => api.post(`/forum/posts/${postId}/flag`, { reason }),
+}
+
+// Doctors
+export const doctorApi = {
+  getAll: () => api.get('/doctors'),
 }
