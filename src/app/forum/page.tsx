@@ -132,7 +132,7 @@ export default function ForumPage() {
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
           {TOPICS.map(t => (
             <button key={t} onClick={() => setTopic(t)} style={{
-              padding: '6px 16px', borderRadius: 999, fontSize: 13, fontWeight: 500, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+              padding: '6px 16px', borderRadius: 999, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
               background: topic === t ? 'var(--brand)' : 'white',
               color: topic === t ? 'white' : '#6b7280',
               border: topic === t ? 'none' : '1px solid #e5e7eb',
