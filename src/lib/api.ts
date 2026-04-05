@@ -1,11 +1,17 @@
 import axios from 'axios'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://junction.proxy.rlwy.net:27523'
+// NEXT_PUBLIC_API_URL must be set in Vercel environment variables
+// It must be the HTTPS Railway URL e.g. https://glpkart-backend.up.railway.app
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
+
+if (!API_URL && typeof window !== 'undefined') {
+  console.error('NEXT_PUBLIC_API_URL is not set. Login will not work.')
+}
 
 export const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
-  withCredentials: true,
+  withCredentials: false,
 })
 
 // Attach JWT to every request
@@ -24,7 +30,7 @@ export const authApi = {
   logout: () => api.post('/auth/logout'),
 }
 
-// Patient helpers
+// Journey helpers
 export const journeyApi = {
   getDashboard: () => api.get('/journey/dashboard'),
   logWeight: (weightKg: number) => api.post('/journey/weight', { weightKg }),
