@@ -49,16 +49,14 @@ export default function ForumPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    loadPosts()
-  }, [topic])
+  useEffect(() => { loadPosts() }, [topic])
 
   async function loadPosts() {
     setLoading(true)
     try {
       const res = await forumApi.getPosts(topic === 'All' ? undefined : topic)
       setPosts(res.data.posts)
-    } catch {}
+    } catch (e) { console.error(e) }
     setLoading(false)
   }
 
@@ -84,20 +82,34 @@ export default function ForumPage() {
     try {
       await forumApi.markHelpful(postId)
       setPosts(posts.map(p => p.id === postId ? { ...p, helpfulCount: p.helpfulCount + 1 } : p))
-    } catch {}
+    } catch (e) { console.error(e) }
   }
 
   function timeAgo(date: string) {
     const diff = Date.now() - new Date(date).getTime()
     const hours = Math.floor(diff / 3600000)
     if (hours < 1) return 'Just now'
-    if (hours < 24) return `${hours}h ago`
-    return `${Math.floor(hours / 24)}d ago`
+    if (hours < 24) return hours + 'h ago'
+    return Math.floor(hours / 24) + 'd ago'
+  }
+
+  function topicBtnStyle(t: string) {
+    const active = topic === t
+    return {
+      padding: '6px 16px',
+      borderRadius: 999,
+      fontSize: 13,
+      fontWeight: 500,
+      cursor: 'pointer',
+      fontFamily: 'inherit',
+      background: active ? 'var(--brand)' : 'white',
+      color: active ? 'white' : '#6b7280',
+      border: active ? '1px solid var(--brand)' : '1px solid #e5e7eb',
+    } as React.CSSProperties
   }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--cream)', fontFamily: "'DM Sans', sans-serif" }}>
-      {/* Nav */}
       <nav style={{ background: 'white', borderBottom: '1px solid #e5e7eb', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Link href="/" style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: 'var(--brand-dark)', textDecoration: 'none' }}>
           GLP<span style={{ color: 'var(--brand)' }}>Kart</span>
@@ -114,35 +126,26 @@ export default function ForumPage() {
       </nav>
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
-        {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 36, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>Community</h1>
           <p style={{ fontSize: 15, color: '#6b7280' }}>Anonymous, honest conversations about GLP-1. Your real name is never shown.</p>
         </div>
 
-        {/* Anonymous notice */}
         <div style={{ background: '#f0fdf6', border: '1px solid #bbf7d2', borderRadius: 12, padding: 16, marginBottom: 24, display: 'flex', gap: 12, alignItems: 'flex-start', fontSize: 14, color: '#15803c' }}>
           <span>🔒</span>
           <div>
-            <strong>Fully anonymous.</strong> Your posts appear under a generated persona (e.g. QuietRiver_42). Your real name or phone number is never shown to anyone. Even admins require special access to see identity.
+            <strong>Fully anonymous.</strong> Your posts appear under a generated persona (e.g. QuietRiver_42). Your real name or phone number is never shown to anyone.
           </div>
         </div>
 
-        {/* Topic filter */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
           {TOPICS.map(t => (
-            <button key={t} onClick={() => setTopic(t)} style={{
-              padding: '6px 16px', borderRadius: 999, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-              background: topic === t ? 'var(--brand)' : 'white',
-              color: topic === t ? 'white' : '#6b7280',
-              border: topic === t ? 'none' : '1px solid #e5e7eb',
-            }}>
+            <button key={t} onClick={() => setTopic(t)} style={topicBtnStyle(t)}>
               {TOPIC_LABELS[t]}
             </button>
           ))}
         </div>
 
-        {/* New post modal */}
         {showNew && (
           <div style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #e5e7eb', marginBottom: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -152,27 +155,21 @@ export default function ForumPage() {
             <select value={newTopic} onChange={e => setNewTopic(e.target.value)} style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 14, marginBottom: 12, outline: 'none', fontFamily: 'inherit' }}>
               {TOPICS.filter(t => t !== 'All').map(t => <option key={t} value={t}>{TOPIC_LABELS[t]}</option>)}
             </select>
-            <input type="text" placeholder="Title — what's your post about?" value={newTitle} onChange={e => setNewTitle(e.target.value)}
+            <input type="text" placeholder="Title" value={newTitle} onChange={e => setNewTitle(e.target.value)}
               style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 15, marginBottom: 12, outline: 'none', fontFamily: 'inherit' }} />
-            <textarea placeholder="Share your experience, question, or story..." value={newBody} onChange={e => setNewBody(e.target.value)} rows={4}
+            <textarea placeholder="Share your experience..." value={newBody} onChange={e => setNewBody(e.target.value)} rows={4}
               style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 14, marginBottom: 12, outline: 'none', fontFamily: 'inherit', resize: 'vertical' }} />
             {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button onClick={submitPost} disabled={submitting} style={{ padding: '10px 24px', background: 'var(--brand)', color: 'white', borderRadius: 8, border: 'none', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
-                {submitting ? 'Posting...' : 'Post anonymously'}
-              </button>
-              <p style={{ fontSize: 12, color: '#9ca3af', alignSelf: 'center' }}>Will appear as your persona, not your name</p>
-            </div>
+            <button onClick={submitPost} disabled={submitting} style={{ padding: '10px 24px', background: 'var(--brand)', color: 'white', borderRadius: 8, border: 'none', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+              {submitting ? 'Posting...' : 'Post anonymously'}
+            </button>
           </div>
         )}
 
-        {/* Posts */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af', fontSize: 15 }}>Loading posts...</div>
         ) : posts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af', fontSize: 15 }}>
-            No posts yet in this category. Be the first to share!
-          </div>
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af', fontSize: 15 }}>No posts yet. Be the first to share!</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {posts.map(post => (
@@ -192,17 +189,15 @@ export default function ForumPage() {
                     {TOPIC_LABELS[post.topic] || post.topic}
                   </span>
                 </div>
-
                 <h3 style={{ fontSize: 17, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>{post.title}</h3>
                 <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7, marginBottom: 16 }}>
                   {post.body.length > 300 ? post.body.slice(0, 300) + '...' : post.body}
                 </p>
-
                 <div style={{ display: 'flex', gap: 16, fontSize: 13, color: '#9ca3af' }}>
                   <button onClick={() => markHelpful(post.id)} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', padding: 0 }}>
                     ♥ {post.helpfulCount} helpful
                   </button>
-                  <Link href={`/forum/${post.id}`} style={{ color: '#9ca3af', textDecoration: 'none' }}>
+                  <Link href={'/forum/' + post.id} style={{ color: '#9ca3af', textDecoration: 'none' }}>
                     {post._count?.replies || 0} replies →
                   </Link>
                 </div>
