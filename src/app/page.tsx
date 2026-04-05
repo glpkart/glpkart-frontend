@@ -1,210 +1,382 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { forumApi } from '@/lib/api'
-import { useAuthStore } from '@/lib/store'
 
-const TOPICS = ['All', 'SIDE_EFFECTS', 'FOOD_AND_EATING', 'SUCCESS_STORIES', 'DOSING_QUESTIONS', 'MENTAL_HEALTH', 'DOCTOR_ADVICE', 'OTHER']
-const TOPIC_LABELS: Record<string, string> = {
-  All: 'All posts',
-  SIDE_EFFECTS: 'Side effects',
-  FOOD_AND_EATING: 'Food & eating',
-  SUCCESS_STORIES: 'Success stories',
-  DOSING_QUESTIONS: 'Dosing questions',
-  MENTAL_HEALTH: 'Mental health',
-  DOCTOR_ADVICE: 'Doctor advice',
-  OTHER: 'Other',
-}
-const TOPIC_COLORS: Record<string, string> = {
-  SIDE_EFFECTS: '#fef9c3',
-  FOOD_AND_EATING: '#dcfce9',
-  SUCCESS_STORIES: '#dbeafe',
-  DOSING_QUESTIONS: '#fce7f3',
-  MENTAL_HEALTH: '#ede9fe',
-  DOCTOR_ADVICE: '#ffedd5',
-  OTHER: '#f3f4f6',
-}
+const G = '#16a34a'
+const GD = '#14532b'
+const GL = '#EAF3DE'
+const DARK = '#0f1f0f'
+const DARK2 = '#111d11'
+const CREAM = '#FAFAF7'
+const INK = '#1a1a1a'
+const MUTED = '#6b7280'
+const FAINT = '#9ca3af'
+const BORDER = '#e5e7eb'
+const SERIF = "'Playfair Display', Georgia, serif"
+const SANS = "'DM Sans', -apple-system, sans-serif"
 
-interface Post {
-  id: string
-  personaName: string
-  title: string
-  body: string
-  topic: string
-  isDoctorPost: boolean
-  helpfulCount: number
-  createdAt: string
-  _count?: { replies: number }
-}
+const FAQS = [
+  { q: 'Is this safe?', a: 'GLP-1 therapy is prescribed only after a full medical consultation with a licensed endocrinologist. Our doctors screen for contraindications including thyroid conditions, pancreatitis history, and kidney disease. If GLP-1 is not suitable for you, it will not be prescribed.' },
+  { q: "What's the difference between branded and generic?", a: 'Generic GLP-1 medications contain the same active ingredient at the same dose as branded versions but cost 60–70% less. Your doctor will discuss both options and recommend based on your goals and budget.' },
+  { q: 'What if I am not eligible?', a: 'If the doctor determines GLP-1 therapy is not right for you, you pay nothing. No questions asked, full refund.' },
+  { q: 'Is Mumbai the only city for delivery?', a: 'Medication delivery is currently available within Mumbai, Thane, and Navi Mumbai. Teleconsultations are available for anyone across India.' },
+  { q: 'Is my identity private?', a: 'Your forum posts appear under a randomly generated persona — never your real name. Medical data is stored encrypted and DPDPA 2023 compliant.' },
+]
 
-export default function ForumPage() {
-  const { isLoggedIn } = useAuthStore()
-  const [posts, setPosts] = useState<Post[]>([])
-  const [topic, setTopic] = useState('All')
-  const [loading, setLoading] = useState(true)
-  const [showNew, setShowNew] = useState(false)
-  const [newTitle, setNewTitle] = useState('')
-  const [newBody, setNewBody] = useState('')
-  const [newTopic, setNewTopic] = useState('OTHER')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
+export default function HomePage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [scrolled, setScrolled] = useState(false)
 
-  useEffect(() => { loadPosts() }, [topic])
-
-  async function loadPosts() {
-    setLoading(true)
-    try {
-      const res = await forumApi.getPosts(topic === 'All' ? undefined : topic)
-      setPosts(res.data.posts)
-    } catch (e) { console.error(e) }
-    setLoading(false)
-  }
-
-  async function submitPost() {
-    if (!newTitle.trim() || !newBody.trim()) { setError('Please fill in both title and body'); return }
-    if (!isLoggedIn()) { setError('Please log in to post'); return }
-    setSubmitting(true)
-    setError('')
-    try {
-      await forumApi.createPost({ title: newTitle, body: newBody, topic: newTopic })
-      setShowNew(false)
-      setNewTitle('')
-      setNewBody('')
-      await loadPosts()
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to post. Please try again.')
-    }
-    setSubmitting(false)
-  }
-
-  async function markHelpful(postId: string) {
-    if (!isLoggedIn()) return
-    try {
-      await forumApi.markHelpful(postId)
-      setPosts(posts.map(p => p.id === postId ? { ...p, helpfulCount: p.helpfulCount + 1 } : p))
-    } catch (e) { console.error(e) }
-  }
-
-  function timeAgo(date: string) {
-    const diff = Date.now() - new Date(date).getTime()
-    const hours = Math.floor(diff / 3600000)
-    if (hours < 1) return 'Just now'
-    if (hours < 24) return hours + 'h ago'
-    return Math.floor(hours / 24) + 'd ago'
-  }
-
-  function topicBtnStyle(t: string) {
-    const active = topic === t
-    return {
-      padding: '6px 16px',
-      borderRadius: 999,
-      fontSize: 13,
-      fontWeight: 500,
-      cursor: 'pointer',
-      fontFamily: 'inherit',
-      background: active ? 'var(--brand)' : 'white',
-      color: active ? 'white' : '#6b7280',
-      border: active ? '1px solid var(--brand)' : '1px solid #e5e7eb',
-    } as React.CSSProperties
-  }
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 50)
+    window.addEventListener('scroll', fn)
+    return () => window.removeEventListener('scroll', fn)
+  }, [])
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--cream)', fontFamily: "'DM Sans', sans-serif" }}>
-      <nav style={{ background: 'white', borderBottom: '1px solid #e5e7eb', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: 'var(--brand-dark)', textDecoration: 'none' }}>
-          GLP<span style={{ color: 'var(--brand)' }}>Kart</span>
-        </Link>
-        <div style={{ display: 'flex', gap: 24, fontSize: 14 }}>
-          <Link href="/dashboard" style={{ color: '#6b7280', textDecoration: 'none' }}>Dashboard</Link>
-          <Link href="/forum" style={{ color: 'var(--brand)', fontWeight: 600, textDecoration: 'none' }}>Community</Link>
-          <Link href="/book" style={{ color: '#6b7280', textDecoration: 'none' }}>Book consult</Link>
+    <div style={{ minHeight: '100vh', background: CREAM, fontFamily: SANS, color: INK, overflowX: 'hidden' }}>
+
+      {/* Top bar */}
+      <div style={{ background: G, color: 'white', textAlign: 'center', padding: '9px 20px', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#86efac', display: 'inline-block' }} />
+        Doctors available today in Mumbai &nbsp;·&nbsp; GLP-1 consultations starting ₹799
+      </div>
+
+      {/* Nav */}
+      <nav style={{ position: 'sticky', top: 0, zIndex: 90, background: scrolled ? 'rgba(250,250,247,0.97)' : CREAM, borderBottom: `1px solid ${BORDER}`, padding: '0 40px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backdropFilter: scrolled ? 'blur(12px)' : 'none', transition: 'all 0.3s' }}>
+        <div style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: GD }}>GLP<span style={{ color: G }}>Kart</span></div>
+        <div style={{ display: 'flex', gap: 28, fontSize: 14, color: '#374151' }}>
+          <a href="#how-it-works" style={{ textDecoration: 'none', color: 'inherit' }}>How it works</a>
+          <a href="#medication" style={{ textDecoration: 'none', color: 'inherit' }}>Medication</a>
+          <a href="#pricing" style={{ textDecoration: 'none', color: 'inherit' }}>Pricing</a>
+          <a href="#faq" style={{ textDecoration: 'none', color: 'inherit' }}>FAQ</a>
         </div>
-        {isLoggedIn()
-          ? <button onClick={() => setShowNew(true)} style={{ padding: '8px 20px', background: 'var(--brand)', color: 'white', borderRadius: 8, border: 'none', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>New post</button>
-          : <Link href="/login?next=forum" style={{ padding: '8px 20px', background: 'var(--brand)', color: 'white', borderRadius: 8, fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>Join community</Link>
-        }
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Link href="/login" style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, color: G, border: `1.5px solid ${G}`, textDecoration: 'none', fontWeight: 500 }}>Log in</Link>
+          <Link href="/quiz" style={{ padding: '9px 20px', borderRadius: 8, fontSize: 13, background: G, color: 'white', textDecoration: 'none', fontWeight: 500 }}>Check eligibility</Link>
+        </div>
       </nav>
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 36, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>Community</h1>
-          <p style={{ fontSize: 15, color: '#6b7280' }}>Anonymous, honest conversations about GLP-1. Your real name is never shown.</p>
-        </div>
+      {/* Hero - dark */}
+      <div style={{ background: DARK }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 40px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'end' }}>
 
-        <div style={{ background: '#f0fdf6', border: '1px solid #bbf7d2', borderRadius: 12, padding: 16, marginBottom: 24, display: 'flex', gap: 12, alignItems: 'flex-start', fontSize: 14, color: '#15803c' }}>
-          <span>🔒</span>
-          <div>
-            <strong>Fully anonymous.</strong> Your posts appear under a generated persona (e.g. QuietRiver_42). Your real name or phone number is never shown to anyone.
+          {/* Left copy */}
+          <div style={{ paddingBottom: 64 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(22,163,74,0.2)', border: '1px solid rgba(134,239,172,0.3)', borderRadius: 999, padding: '5px 14px', fontSize: 12, color: '#86efac', marginBottom: 28 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block' }} />
+              India's first GLP-1 telehealth platform
+            </div>
+            <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(36px, 4.5vw, 54px)', fontWeight: 700, color: 'white', lineHeight: 1.08, marginBottom: 22, letterSpacing: '-0.5px' }}>
+              Weight loss<br />that works<br /><span style={{ color: '#4ade80' }}>with your body.</span>
+            </h1>
+            <p style={{ fontSize: 16, color: FAINT, lineHeight: 1.75, maxWidth: 420, marginBottom: 36 }}>
+              GLP-1 therapy works by restoring the hunger hormone your body was always meant to have. Doctor-led, science-backed, delivered to your door.
+            </p>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 32 }}>
+              <Link href="/quiz" style={{ padding: '14px 30px', borderRadius: 10, fontSize: 15, background: G, color: 'white', textDecoration: 'none', fontWeight: 600 }}>
+                Check eligibility — free
+              </Link>
+              <a href="#how-it-works" style={{ padding: '14px 26px', borderRadius: 10, fontSize: 15, color: 'white', border: '1.5px solid rgba(255,255,255,0.25)', textDecoration: 'none' }}>
+                How it works
+              </a>
+            </div>
+            <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
+              {['Licensed doctors only', 'No commitment', 'Free if not eligible'].map((t, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: MUTED }}>
+                  <span style={{ width: 5, height: 5, borderRadius: '50%', background: G, display: 'inline-block' }} />{t}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right - stat cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 40 }}>
+            <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '20px 24px' }}>
+              <div style={{ fontSize: 11, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Average weight lost</div>
+              <div style={{ fontFamily: SERIF, fontSize: 40, fontWeight: 700, color: 'white', lineHeight: 1 }}>18<span style={{ fontSize: 20, color: MUTED }}>%</span></div>
+              <div style={{ fontSize: 13, color: FAINT, marginTop: 4 }}>body weight over 68 weeks in clinical trials</div>
+              <div style={{ height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, marginTop: 12, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: '18%', background: G, borderRadius: 2 }} />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '20px 24px' }}>
+                <div style={{ fontSize: 11, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>vs diet alone</div>
+                <div style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: 'white', lineHeight: 1 }}>6×</div>
+                <div style={{ fontSize: 13, color: FAINT, marginTop: 4 }}>more effective</div>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '20px 24px' }}>
+                <div style={{ fontSize: 11, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>First consult</div>
+                <div style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1 }}>₹799</div>
+                <div style={{ fontSize: 13, color: FAINT, marginTop: 4 }}>30-min specialist</div>
+              </div>
+            </div>
+            <div style={{ background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 14, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#4ade80" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#4ade80" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'white' }}>Eligible patients only</div>
+                <div style={{ fontSize: 12, color: MUTED }}>Doctor screens before prescribing</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
-          {TOPICS.map(t => (
-            <button key={t} onClick={() => setTopic(t)} style={topicBtnStyle(t)}>
-              {TOPIC_LABELS[t]}
-            </button>
+        {/* Stats strip */}
+        <div style={{ background: 'rgba(255,255,255,0.04)', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 40px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', textAlign: 'center', gap: 24 }}>
+            {[{ n: '500+', l: 'Patients on GLP-1' }, { n: '3 min', l: 'To check eligibility' }, { n: '48h', l: 'Consult to delivery' }].map((s, i) => (
+              <div key={i}>
+                <div style={{ fontFamily: SERIF, fontSize: 38, fontWeight: 700, color: '#4ade80' }}>{s.n}</div>
+                <div style={{ fontSize: 13, color: MUTED, marginTop: 4 }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* How it works */}
+      <div id="how-it-works" style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 40px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 580, margin: '0 auto 48px' }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: G, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>Your journey</div>
+          <h2 style={{ fontFamily: SERIF, fontSize: 38, fontWeight: 700, color: INK, lineHeight: 1.15, marginBottom: 12 }}>Four steps to a different body.</h2>
+          <p style={{ fontSize: 15, color: MUTED, lineHeight: 1.7 }}>Everything handled end-to-end.</p>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+          {[
+            { n: '01', title: 'Take the quiz', body: '3-minute anonymous eligibility check. No signup needed. Find out immediately if GLP-1 could work for you.', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="3" stroke={G} strokeWidth="1.5"/><path d="M7 11h8M11 7v8" stroke={G} strokeWidth="1.5" strokeLinecap="round"/></svg> },
+            { n: '02', title: 'Sign up & book', body: 'Create your account and book a 30-min WhatsApp consult with a licensed endocrinologist. They prescribe if suitable.', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke={G} strokeWidth="1.5"/><path d="M4 19c0-3.314 3.134-6 7-6s7 2.686 7 6" stroke={G} strokeWidth="1.5" strokeLinecap="round"/></svg> },
+            { n: '03', title: 'Receive medication', body: 'Licensed GLP-1 — branded or generic. Delivered discreetly in Mumbai within 48 hours of your prescription.', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><ellipse cx="11" cy="11" rx="8" ry="5" stroke={G} strokeWidth="1.5"/><path d="M3 11h16" stroke={G} strokeWidth="1.5"/></svg> },
+            { n: '04', title: 'Track & connect', body: 'Log weight and injections on your dashboard. Once treatment starts, access the anonymous community forum.', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 16l4-4 3 3 7-7" stroke={G} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+          ].map((step, i) => (
+            <div key={i} style={{ background: 'white', border: `1px solid ${BORDER}`, borderRadius: 16, padding: '28px 22px', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: G }} />
+              <div style={{ fontFamily: SERIF, fontSize: 34, fontWeight: 700, color: '#e5e7eb', marginBottom: 14 }}>{step.n}</div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: GL, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>{step.icon}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: INK, marginBottom: 8 }}>{step.title}</div>
+              <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.65 }}>{step.body}</div>
+            </div>
           ))}
         </div>
 
-        {showNew && (
-          <div style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #e5e7eb', marginBottom: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a' }}>Share your experience</h3>
-              <button onClick={() => setShowNew(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9ca3af' }}>×</button>
-            </div>
-            <select value={newTopic} onChange={e => setNewTopic(e.target.value)} style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 14, marginBottom: 12, outline: 'none', fontFamily: 'inherit' }}>
-              {TOPICS.filter(t => t !== 'All').map(t => <option key={t} value={t}>{TOPIC_LABELS[t]}</option>)}
-            </select>
-            <input type="text" placeholder="Title" value={newTitle} onChange={e => setNewTitle(e.target.value)}
-              style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 15, marginBottom: 12, outline: 'none', fontFamily: 'inherit' }} />
-            <textarea placeholder="Share your experience..." value={newBody} onChange={e => setNewBody(e.target.value)} rows={4}
-              style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 14, marginBottom: 12, outline: 'none', fontFamily: 'inherit', resize: 'vertical' }} />
-            {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</p>}
-            <button onClick={submitPost} disabled={submitting} style={{ padding: '10px 24px', background: 'var(--brand)', color: 'white', borderRadius: 8, border: 'none', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
-              {submitting ? 'Posting...' : 'Post anonymously'}
-            </button>
-          </div>
-        )}
+        {/* CTA after steps */}
+        <div style={{ marginTop: 40, textAlign: 'center' }}>
+          <Link href="/quiz" style={{ display: 'inline-flex', padding: '14px 36px', borderRadius: 10, fontSize: 15, fontWeight: 600, background: G, color: 'white', textDecoration: 'none' }}>
+            Start with the quiz →
+          </Link>
+          <p style={{ fontSize: 12, color: FAINT, marginTop: 12 }}>Anonymous · Free · No signup needed for the quiz</p>
+        </div>
+      </div>
 
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af', fontSize: 15 }}>Loading posts...</div>
-        ) : posts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af', fontSize: 15 }}>No posts yet. Be the first to share!</div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {posts.map(post => (
-              <div key={post.id} style={{ background: 'white', borderRadius: 16, padding: 24, border: '1px solid #e5e7eb' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#f0fdf6', border: '2px solid #86efac', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 600, color: 'var(--brand)', flexShrink: 0 }}>
-                    {post.personaName[0]}
+      {/* Medication */}
+      <div id="medication" style={{ background: DARK2, padding: '80px 40px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>Medication</div>
+          <h2 style={{ fontFamily: SERIF, fontSize: 38, fontWeight: 700, color: 'white', marginBottom: 48, lineHeight: 1.15 }}>Licensed GLP-1 medication.<br />Branded and generic options.</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            {[
+              { name: 'Semaglutide', type: 'GLP-1 receptor agonist', badge: 'Weekly injection', desc: 'The most studied GLP-1 medication for weight loss. Average 15–18% body weight reduction in clinical trials. Available in branded and generic forms.', feats: ['Once weekly', '0.25mg → 2.4mg', 'Subcutaneous', 'Prescription only'] },
+              { name: 'Tirzepatide', type: 'GLP-1 + GIP dual agonist', badge: 'Dual-action', desc: 'Targets two hunger hormones simultaneously. Newer mechanism showing 20–22% weight reduction — the highest of any currently approved medication. Available in branded and generic forms.', feats: ['Once weekly', '2.5mg → 15mg', 'Subcutaneous', 'Prescription only'] },
+            ].map((med, i) => (
+              <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: 32 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><ellipse cx="13" cy="13" rx="9" ry="5.5" stroke="#4ade80" strokeWidth="1.5"/><path d="M4 13h18" stroke="#4ade80" strokeWidth="1.5"/></svg>
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 500, color: '#1a1a1a' }}>{post.personaName}</div>
-                    <div style={{ fontSize: 12, color: '#9ca3af' }}>{timeAgo(post.createdAt)}</div>
-                  </div>
-                  {post.isDoctorPost && (
-                    <span style={{ fontSize: 11, background: '#dcfce9', color: '#15803c', padding: '3px 10px', borderRadius: 999, fontWeight: 600 }}>Doctor</span>
-                  )}
-                  <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 999, fontWeight: 500, background: TOPIC_COLORS[post.topic] || '#f3f4f6', color: '#374151' }}>
-                    {TOPIC_LABELS[post.topic] || post.topic}
-                  </span>
+                  <span style={{ fontSize: 11, background: 'rgba(74,222,128,0.15)', color: '#4ade80', padding: '4px 12px', borderRadius: 999, fontWeight: 600, border: '1px solid rgba(74,222,128,0.2)' }}>{med.badge}</span>
                 </div>
-                <h3 style={{ fontSize: 17, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>{post.title}</h3>
-                <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.7, marginBottom: 16 }}>
-                  {post.body.length > 300 ? post.body.slice(0, 300) + '...' : post.body}
-                </p>
-                <div style={{ display: 'flex', gap: 16, fontSize: 13, color: '#9ca3af' }}>
-                  <button onClick={() => markHelpful(post.id)} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', padding: 0 }}>
-                    ♥ {post.helpfulCount} helpful
-                  </button>
-                  <Link href={'/forum/' + post.id} style={{ color: '#9ca3af', textDecoration: 'none' }}>
-                    {post._count?.replies || 0} replies →
-                  </Link>
+                <div style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 4 }}>{med.name}</div>
+                <div style={{ fontSize: 13, color: MUTED, marginBottom: 14 }}>{med.type} · Branded & generic available</div>
+                <div style={{ fontSize: 14, color: FAINT, lineHeight: 1.7, marginBottom: 20 }}>{med.desc}</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {med.feats.map((f, j) => (
+                    <span key={j} style={{ fontSize: 12, color: FAINT, background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.08)' }}>{f}</span>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
-        )}
+          <div style={{ marginTop: 16, padding: '16px 20px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, fontSize: 13, color: MUTED, textAlign: 'center' }}>
+            Your doctor selects the right medication and dose based on your health history, goals, and budget. Generic options reduce cost by 60–70%.
+          </div>
+        </div>
+      </div>
+
+      {/* Science */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: G, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>The science</div>
+            <h2 style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: INK, lineHeight: 1.15, marginBottom: 18 }}>A hormone problem, not a willpower problem.</h2>
+            <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.8, marginBottom: 14 }}>GLP-1 is the hormone your gut releases after eating to signal fullness to your brain. In many people, this signal is weaker than it should be — making appetite feel impossible to control.</p>
+            <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.8 }}>GLP-1 therapy restores this signal. You feel full sooner. You eat less naturally. Weight loss follows — measurably and consistently.</p>
+            <div style={{ marginTop: 24, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {[{ n: '68 weeks', l: 'avg trial duration' }, { n: '2× faster', l: 'vs diet + exercise' }, { n: '85%', l: 'lose >5% body weight' }].map((st, i) => (
+                <div key={i} style={{ background: GL, borderRadius: 10, padding: '12px 18px' }}>
+                  <div style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 700, color: G }}>{st.n}</div>
+                  <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{st.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ background: GL, borderRadius: 20, padding: 36 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#3B6D11', marginBottom: 20, textTransform: 'uppercase', letterSpacing: '0.08em' }}>How it works in your body</div>
+            {[
+              { t: 'Medication injected once weekly', s: 'Subcutaneous, just under the skin' },
+              { t: 'GLP-1 receptors activated', s: 'In gut, brain stem, and pancreas' },
+              { t: 'Brain receives "full" signal', s: 'Appetite naturally decreases' },
+              { t: 'Blood sugar stabilises', s: 'Slower glucose absorption' },
+              { t: 'Sustained weight loss', s: 'Consistent and measurable' },
+            ].map((step, i) => (
+              <div key={i}>
+                <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                  <div style={{ width: 26, height: 26, borderRadius: '50%', background: G, color: 'white', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: INK }}>{step.t}</div>
+                    <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{step.s}</div>
+                  </div>
+                </div>
+                {i < 4 && <div style={{ width: 1, height: 14, background: '#C0DD97', margin: '3px 0 3px 12px' }} />}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Trust */}
+      <div style={{ background: 'white', padding: '72px 40px', borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 520, margin: '0 auto 48px' }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: G, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>Why GLPKart</div>
+            <h2 style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: INK }}>Built around your safety.</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
+            {[
+              { title: 'Licensed doctors only', body: 'Every prescription issued by a registered endocrinologist. No auto-prescribing.' },
+              { title: 'Branded & generic', body: 'Access to both options. Your doctor recommends based on your budget and goals.' },
+              { title: 'Fully anonymous', body: 'Forum posts appear under a generated persona. Medical data is encrypted.' },
+              { title: 'Free if not eligible', body: 'If GLP-1 is not right for you, the consultation is free. No questions asked.' },
+            ].map((t, i) => (
+              <div key={i} style={{ textAlign: 'center', padding: '24px 16px' }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: GL, margin: '0 auto 14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke={G} strokeWidth="1.5"/><path d="M7 11l3 3 5-5" stroke={G} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 8 }}>{t.title}</div>
+                <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.6 }}>{t.body}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Community preview — sign-in wall */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: G, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>Community</div>
+            <h2 style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: INK, lineHeight: 1.15, marginBottom: 16 }}>You're not doing this alone.</h2>
+            <p style={{ fontSize: 15, color: '#4b5563', lineHeight: 1.8, marginBottom: 20 }}>India has very few safe spaces to talk honestly about weight. Our anonymous forum gives patients on treatment a place to share real experiences without judgment.</p>
+            {['Posts appear under a generated persona — never your name', 'Doctor-verified replies are highlighted', 'Available after your first consultation'].map((f, i) => (
+              <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, color: '#374151', marginBottom: 10, alignItems: 'flex-start' }}>
+                <span style={{ color: G, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[
+              { p: 'QuietRiver_42', time: '2h ago', tag: 'Side effects', tagBg: '#fef9c3', tagC: '#854F0B', body: 'Week 3 on 0.25mg — nausea mostly gone by day 5. Eating so much less without even trying. Down 2.1kg already.' },
+              { p: 'MapleDawn_18', time: '5h ago', tag: 'Doctor replied', tagBg: '#dbeafe', tagC: '#1d4ed8', body: 'Hit 10kg down today. 11 weeks. I wore a dress I haven\'t touched in 4 years. Needed to share this somewhere safe.' },
+            ].map((post, i) => (
+              <div key={i} style={{ background: 'white', border: `1px solid ${BORDER}`, borderRadius: 14, padding: '18px 20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: GL, border: '2px solid #C0DD97', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#3B6D11', flexShrink: 0 }}>{post.p[0]}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: INK }}>{post.p}</div>
+                    <div style={{ fontSize: 11, color: FAINT }}>{post.time}</div>
+                  </div>
+                  <span style={{ fontSize: 10, background: post.tagBg, color: post.tagC, padding: '2px 8px', borderRadius: 999, fontWeight: 600 }}>{post.tag}</span>
+                </div>
+                <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.6, filter: i === 1 ? 'blur(3px)' : 'none', userSelect: 'none' }}>{post.body}</div>
+              </div>
+            ))}
+            {/* Sign-in wall */}
+            <div style={{ background: GL, border: '1px solid #C0DD97', borderRadius: 14, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#3B6D11' }}>Access the community after treatment starts</div>
+                <div style={{ fontSize: 12, color: '#639922', marginTop: 3 }}>Sign in → book consult → forum unlocks</div>
+              </div>
+              <Link href="/login" style={{ padding: '10px 20px', background: G, color: 'white', borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap' }}>Sign in →</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pricing */}
+      <div id="pricing" style={{ background: CREAM, padding: '80px 40px', borderTop: `1px solid ${BORDER}` }}>
+        <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: G, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>Pricing</div>
+          <h2 style={{ fontFamily: SERIF, fontSize: 38, fontWeight: 700, color: INK, marginBottom: 10 }}>Honest, simple pricing.</h2>
+          <p style={{ fontSize: 15, color: MUTED, marginBottom: 48 }}>Pay per consult. No subscriptions. No lock-in.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div style={{ padding: 36, borderRadius: 20, border: `2px solid ${BORDER}`, textAlign: 'left', background: 'white' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Consultation</div>
+              <div style={{ fontFamily: SERIF, fontSize: 48, fontWeight: 700, color: INK, lineHeight: 1 }}>₹799</div>
+              <div style={{ fontSize: 13, color: FAINT, margin: '6px 0 24px' }}>per doctor session</div>
+              {['30-min WhatsApp call', 'Licensed endocrinologist', 'Digital prescription', 'Free if not eligible'].map((f, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 10, fontSize: 13, color: '#374151', alignItems: 'center' }}>
+                  <span style={{ color: G, fontWeight: 700 }}>✓</span>{f}
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: 36, borderRadius: 20, border: `2px solid ${G}`, background: GL, textAlign: 'left', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: -12, left: 20, background: G, color: 'white', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 999 }}>Most value</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#3B6D11', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Medication (monthly approx)</div>
+              <div style={{ fontFamily: SERIF, fontSize: 48, fontWeight: 700, color: INK, lineHeight: 1 }}>₹3,500+</div>
+              <div style={{ fontSize: 13, color: MUTED, margin: '6px 0 24px' }}>generic semaglutide, 4-week supply</div>
+              {['Generic & branded options', 'Discreet Mumbai delivery', 'Delivered as "GK Healthcare"', 'Prescription required'].map((f, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 10, fontSize: 13, color: '#374151', alignItems: 'center' }}>
+                  <span style={{ color: G, fontWeight: 700 }}>✓</span>{f}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ marginTop: 16, padding: '14px 20px', background: 'white', border: `1px solid ${BORDER}`, borderRadius: 10, fontSize: 13, color: MUTED }}>
+            Generic GLP-1 medications cost 60–70% less than branded equivalents. Your doctor will discuss all options.
+          </div>
+        </div>
+      </div>
+
+      {/* FAQ */}
+      <div id="faq" style={{ maxWidth: 680, margin: '0 auto', padding: '80px 40px' }}>
+        <h2 style={{ fontFamily: SERIF, fontSize: 38, fontWeight: 700, color: INK, marginBottom: 40, textAlign: 'center' }}>Questions</h2>
+        {FAQS.map((faq, i) => (
+          <div key={i} style={{ borderBottom: `1px solid ${BORDER}` }}>
+            <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: '100%', padding: '18px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 12, fontFamily: SANS }}>
+              <span style={{ fontSize: 15, fontWeight: 500, color: INK }}>{faq.q}</span>
+              <span style={{ fontSize: 22, color: G, transform: openFaq === i ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>+</span>
+            </button>
+            {openFaq === i && <div style={{ paddingBottom: 20, fontSize: 14, color: '#4b5563', lineHeight: 1.75 }}>{faq.a}</div>}
+          </div>
+        ))}
+      </div>
+
+      {/* Final CTA */}
+      <div style={{ background: DARK, padding: '90px 40px', textAlign: 'center' }}>
+        <h2 style={{ fontFamily: SERIF, fontSize: 46, fontWeight: 700, color: 'white', lineHeight: 1.15, marginBottom: 18 }}>Your body isn't broken.<br />It needs the right signal.</h2>
+        <p style={{ fontSize: 16, color: FAINT, marginBottom: 40, lineHeight: 1.75 }}>3-minute anonymous quiz. No commitment. No payment until you see a doctor.</p>
+        <Link href="/quiz" style={{ display: 'inline-flex', padding: '16px 44px', borderRadius: 12, fontSize: 16, fontWeight: 600, background: G, color: 'white', textDecoration: 'none' }}>
+          Check eligibility — free →
+        </Link>
+        <p style={{ fontSize: 12, color: '#4b5563', marginTop: 16 }}>Free if not eligible · Licensed doctors only · DPDPA 2023 compliant</p>
+      </div>
+
+      {/* Footer */}
+      <div style={{ background: '#0a0a0a', padding: '32px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: 'white' }}>GLP<span style={{ color: G }}>Kart</span></div>
+        <div style={{ fontSize: 12, color: '#4b5563' }}>© 2026 GLPKart · Mumbai · hello@glpkart.com</div>
+        <div style={{ display: 'flex', gap: 16 }}>
+          {['Privacy', 'Terms', 'DPDPA'].map(l => <a key={l} href="#" style={{ color: '#4b5563', fontSize: 12, textDecoration: 'none' }}>{l}</a>)}
+        </div>
       </div>
     </div>
   )
