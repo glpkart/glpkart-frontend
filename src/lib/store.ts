@@ -1,3 +1,4 @@
+'use client'
 import { create } from 'zustand'
 
 interface User {
@@ -5,6 +6,7 @@ interface User {
   phone: string
   role: 'PATIENT' | 'DOCTOR' | 'ADMIN'
   forumPersona?: string
+  hasCompletedConsultation?: boolean
 }
 
 interface AuthStore {
@@ -13,6 +15,7 @@ interface AuthStore {
   setAuth: (user: User, token: string) => void
   logout: () => void
   isLoggedIn: () => boolean
+  canAccessForum: () => boolean
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
@@ -35,20 +38,22 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ user: null, token: null })
   },
 
-  isLoggedIn: () => {
-    const { token } = get()
-    return !!token
+  isLoggedIn: () => !!get().token,
+
+  // Forum only accessible after at least 1 consultation completed
+  canAccessForum: () => {
+    const { user, token } = get()
+    return !!token && !!user?.hasCompletedConsultation
   },
 }))
 
-// Initialise from localStorage on client
+// Hydrate from localStorage on client
 if (typeof window !== 'undefined') {
   const stored = localStorage.getItem('glpkart_user')
   const token = localStorage.getItem('glpkart_token')
   if (stored && token) {
     try {
-      const user = JSON.parse(stored)
-      useAuthStore.setState({ user, token })
+      useAuthStore.setState({ user: JSON.parse(stored), token })
     } catch {}
   }
 }
