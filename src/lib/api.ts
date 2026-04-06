@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // All API calls go to /api/backend/* on the same domain (glpkart.com)
 // Next.js rewrites these server-side to the Railway backend
-// This completely avoids mixed content and CORS issues
+// This avoids mixed content and CORS issues entirely
 const API_URL = '/api/backend'
 
 export const api = axios.create({
@@ -20,47 +20,48 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Auth
+// ─── Auth ─────────────────────────────────────────────────────────────────────
 export const authApi = {
   sendOtp: (phone: string) => api.post('/auth/otp/send', { phone }),
   verifyOtp: (phone: string, code: string) => api.post('/auth/otp/verify', { phone, code }),
   logout: () => api.post('/auth/logout'),
 }
 
-// Journey
+// ─── Journey ──────────────────────────────────────────────────────────────────
 export const journeyApi = {
   getDashboard: () => api.get('/journey/dashboard'),
   logWeight: (weightKg: number) => api.post('/journey/weight', { weightKg }),
 }
 
-// Consultations
+// ─── Consultations ────────────────────────────────────────────────────────────
+// Instant booking model — no slots, no Razorpay
+// doctorId from NEXT_PUBLIC_DOCTOR_ID, scheduledAt = now (doctor calls ASAP)
 export const consultApi = {
-  getSlots: (doctorId: string, date: string) =>
-    api.get(`/consultations/slots/${doctorId}?date=${date}`),
   book: (doctorId: string, scheduledAt: string) =>
     api.post('/consultations', { doctorId, scheduledAt }),
   getAll: () => api.get('/consultations'),
 }
 
-// Prescriptions
+// ─── Prescriptions ────────────────────────────────────────────────────────────
 export const prescriptionApi = {
   getAll: () => api.get('/prescriptions'),
 }
 
-// Forum
+// ─── Forum ────────────────────────────────────────────────────────────────────
 export const forumApi = {
   getPosts: (topic?: string, cursor?: string) =>
     api.get('/forum/posts', { params: { topic, cursor, limit: 20 } }),
-  getPost: (id: string) => api.get(`/forum/posts/${id}`),
   createPost: (data: { title: string; body: string; topic: string }) =>
     api.post('/forum/posts', data),
   createReply: (postId: string, body: string) =>
     api.post(`/forum/posts/${postId}/reply`, { body }),
-  markHelpful: (postId: string) => api.post(`/forum/posts/${postId}/helpful`),
-  flag: (postId: string, reason: string) => api.post(`/forum/posts/${postId}/flag`, { reason }),
+  markHelpful: (postId: string) =>
+    api.post(`/forum/posts/${postId}/helpful`),
+  flag: (postId: string, reason: string) =>
+    api.post(`/forum/posts/${postId}/flag`, { reason }),
 }
 
-// Doctors
+// ─── Doctors ──────────────────────────────────────────────────────────────────
 export const doctorApi = {
   getAll: () => api.get('/doctors'),
 }
