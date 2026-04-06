@@ -5,193 +5,174 @@ import Link from 'next/link'
 import { consultApi } from '@/lib/api'
 import { useAuthStore } from '@/lib/store'
 
-// Hardcoded doctor for MVP — in production, fetch from /doctors
-const MVP_DOCTOR = {
-  id: '', // filled from env or first fetch
-  name: 'Available Endocrinologist',
-  qualification: 'MBBS, MD (Endocrinology)',
-  bio: 'Specialised in metabolic disorders, PCOS, and GLP-1 therapy. 8+ years experience. Fluent in English, Hindi, Marathi.',
-}
-
-const TIME_SLOTS = [
-  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-  '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-  '17:00', '17:30', '18:00',
-]
-
-function getNext7Days() {
-  const days = []
-  for (let i = 1; i <= 7; i++) {
-    const d = new Date()
-    d.setDate(d.getDate() + i)
-    days.push(d)
-  }
-  return days
-}
-
-declare global {
-  interface Window { Razorpay: any }
-}
+const G = '#16a34a'
+const GL = '#EAF3DE'
+const GD = '#14532b'
+const BORDER = '#e5e7eb'
+const MUTED = '#6b7280'
+const FAINT = '#9ca3af'
+const INK = '#1a1a1a'
+const SANS = "'DM Sans', -apple-system, sans-serif"
+const SERIF = "'Playfair Display', Georgia, serif"
 
 export default function BookPage() {
   const router = useRouter()
   const { isLoggedIn } = useAuthStore()
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [booking, setBooking] = useState(false)
+  const [done, setDone] = useState(false)
   const [error, setError] = useState('')
-  const days = getNext7Days()
 
   useEffect(() => {
-    if (!isLoggedIn()) { router.push('/login?next=book'); return }
-    // Load Razorpay script
-    const script = document.createElement('script')
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-    document.head.appendChild(script)
+    if (!isLoggedIn()) router.push('/login?next=book')
   }, [])
 
   async function handleBook() {
-    if (!selectedDate || !selectedTime) { setError('Please select a date and time'); return }
-    if (!isLoggedIn()) { router.push('/login?next=book'); return }
     setBooking(true)
     setError('')
-
     try {
-      const scheduledAt = new Date(selectedDate)
-      const [h, m] = selectedTime.split(':')
-      scheduledAt.setHours(parseInt(h), parseInt(m), 0, 0)
-
-      // For MVP: use first available doctor ID
-      // In production: fetch from /doctors and let patient choose
-      const doctorId = process.env.NEXT_PUBLIC_DOCTOR_ID || 'PLACEHOLDER_DOCTOR_ID'
-
-      const res = await consultApi.book(doctorId, scheduledAt.toISOString())
-      const { razorpayOrderId, amountPaise, razorpayKeyId } = res.data
-
-      // Open Razorpay
-      const options = {
-        key: razorpayKeyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY,
-        amount: amountPaise,
-        currency: 'INR',
-        name: 'GLPKart',
-        description: 'GLP-1 Doctor Consultation',
-        order_id: razorpayOrderId,
-        handler: () => {
-          // Payment captured — webhook handles the rest
-          router.push('/dashboard?booked=1')
-        },
-        prefill: { contact: '' },
-        theme: { color: '#16a34a' },
-        modal: { ondismiss: () => setBooking(false) },
+      // Instant booking — scheduledAt is now, doctor calls ASAP
+      const doctorId = process.env.NEXT_PUBLIC_DOCTOR_ID || ''
+      if (!doctorId) {
+        setError('No doctor available right now. Please try again shortly.')
+        setBooking(false)
+        return
       }
-
-      const rzp = new window.Razorpay(options)
-      rzp.open()
+      await consultApi.book(doctorId, new Date().toISOString())
+      setDone(true)
     } catch (err: any) {
       setError(err.response?.data?.error || 'Booking failed. Please try again.')
       setBooking(false)
     }
   }
 
-  return (
-    <div style={{ minHeight: '100vh', background: 'var(--cream)', fontFamily: "'DM Sans', sans-serif" }}>
-      <nav style={{ background: 'white', borderBottom: '1px solid #e5e7eb', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: 'var(--brand-dark)', textDecoration: 'none' }}>
-          GLP<span style={{ color: 'var(--brand)' }}>Kart</span>
-        </Link>
-        <Link href="/dashboard" style={{ fontSize: 14, color: '#6b7280', textDecoration: 'none' }}>← Back to dashboard</Link>
-      </nav>
+  const Nav = (
+    <nav style={{ background: 'white', borderBottom: `1px solid ${BORDER}`, padding: '0 32px', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontFamily: SANS }}>
+      <Link href="/" style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: GD, textDecoration: 'none' }}>
+        GLP<span style={{ color: G }}>Kart</span>
+      </Link>
+      <Link href="/dashboard" style={{ fontSize: 14, color: MUTED, textDecoration: 'none' }}>← Back to dashboard</Link>
+    </nav>
+  )
 
-      <div style={{ maxWidth: 700, margin: '0 auto', padding: '40px 24px' }}>
-        <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 36, fontWeight: 700, color: '#1a1a1a', marginBottom: 8 }}>Book a consultation</h1>
-        <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 40 }}>30-minute WhatsApp call with a licensed endocrinologist. ₹799 only.</p>
+  // ─── Success state ───────────────────────────────────────────────────────────
+  if (done) return (
+    <div style={{ minHeight: '100vh', background: '#FAFAF7', fontFamily: SANS }}>
+      {Nav}
+      <div style={{ maxWidth: 540, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
+        <div style={{ width: 72, height: 72, borderRadius: '50%', background: GL, margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="14" stroke={G} strokeWidth="2"/>
+            <path d="M10 16l4 4 8-8" stroke={G} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <h1 style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: INK, marginBottom: 12 }}>
+          Consultation requested!
+        </h1>
+        <p style={{ fontSize: 15, color: MUTED, lineHeight: 1.8, marginBottom: 32 }}>
+          Your request has been sent to our doctor. They will call you on WhatsApp as soon as possible — usually within a few hours.
+        </p>
+        <div style={{ background: GL, border: '1px solid #C0DD97', borderRadius: 14, padding: 24, marginBottom: 32, textAlign: 'left' }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#3B6D11', marginBottom: 12 }}>What happens next</div>
+          {[
+            'Doctor reviews your profile before calling',
+            'You receive a WhatsApp call — keep your phone handy',
+            '30-minute consultation to assess your eligibility',
+            'Prescription and treatment plan sent after the call',
+          ].map((s, i) => (
+            <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8, fontSize: 13, color: '#374151', alignItems: 'center' }}>
+              <div style={{ width: 22, height: 22, borderRadius: '50%', background: G, color: 'white', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
+              {s}
+            </div>
+          ))}
+        </div>
+        <Link href="/dashboard" style={{ display: 'inline-flex', padding: '13px 32px', background: G, color: 'white', borderRadius: 10, fontSize: 15, fontWeight: 500, textDecoration: 'none' }}>
+          Go to dashboard →
+        </Link>
+      </div>
+    </div>
+  )
+
+  // ─── Booking page ────────────────────────────────────────────────────────────
+  return (
+    <div style={{ minHeight: '100vh', background: '#FAFAF7', fontFamily: SANS }}>
+      {Nav}
+      <div style={{ maxWidth: 600, margin: '0 auto', padding: '48px 24px' }}>
+
+        <h1 style={{ fontFamily: SERIF, fontSize: 32, fontWeight: 700, color: INK, marginBottom: 8 }}>
+          Book a consultation
+        </h1>
+        <p style={{ fontSize: 15, color: MUTED, marginBottom: 36, lineHeight: 1.7 }}>
+          Speak with a licensed endocrinologist on WhatsApp. They will assess your eligibility, answer your questions, and prescribe the right GLP-1 medication.
+        </p>
 
         {/* Doctor card */}
-        <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '1px solid #e5e7eb', marginBottom: 28 }}>
+        <div style={{ background: 'white', borderRadius: 16, padding: 24, border: `1px solid ${BORDER}`, marginBottom: 24 }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-            <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#f0fdf6', border: '2px solid #86efac', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>👨‍⚕️</div>
+            <div style={{ width: 52, height: 52, borderRadius: '50%', background: GL, border: `2px solid #C0DD97`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>👨‍⚕️</div>
             <div>
-              <div style={{ fontSize: 17, fontWeight: 600, color: '#1a1a1a' }}>{MVP_DOCTOR.name}</div>
-              <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 8 }}>{MVP_DOCTOR.qualification}</div>
-              <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.6 }}>{MVP_DOCTOR.bio}</p>
+              <div style={{ fontSize: 17, fontWeight: 600, color: INK }}>Available Endocrinologist</div>
+              <div style={{ fontSize: 13, color: MUTED, marginBottom: 8 }}>MBBS, MD (Endocrinology)</div>
+              <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.65 }}>
+                Specialised in metabolic disorders, PCOS, and GLP-1 therapy. 8+ years experience. Fluent in English, Hindi, Marathi.
+              </p>
             </div>
           </div>
-          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #f3f4f6', display: 'flex', gap: 20, fontSize: 13, color: '#6b7280' }}>
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid #f3f4f6`, display: 'flex', gap: 20, fontSize: 13, color: MUTED, flexWrap: 'wrap' }}>
             <span>📱 WhatsApp call</span>
             <span>⏱ 30 minutes</span>
             <span>💰 ₹799</span>
-            <span>🔒 Private & confidential</span>
+            <span>🔒 Private &amp; confidential</span>
           </div>
         </div>
 
-        {/* Date selection */}
-        <div style={{ marginBottom: 28 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a', marginBottom: 16 }}>Select a date</h3>
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}>
-            {days.map((d, i) => {
-              const selected = selectedDate?.toDateString() === d.toDateString()
-              return (
-                <button key={i} onClick={() => { setSelectedDate(d); setSelectedTime(null) }} style={{
-                  padding: '12px 16px', borderRadius: 12, border: '2px solid', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit', textAlign: 'center',
-                  background: selected ? 'var(--brand)' : 'white',
-                  borderColor: selected ? 'var(--brand)' : '#e5e7eb',
-                  color: selected ? 'white' : '#1a1a1a',
-                }}>
-                  <div style={{ fontSize: 11, marginBottom: 2 }}>{d.toLocaleDateString('en-IN', { weekday: 'short' })}</div>
-                  <div style={{ fontSize: 18, fontWeight: 700 }}>{d.getDate()}</div>
-                  <div style={{ fontSize: 11 }}>{d.toLocaleDateString('en-IN', { month: 'short' })}</div>
-                </button>
-              )
-            })}
-          </div>
+        {/* How it works */}
+        <div style={{ background: 'white', borderRadius: 16, padding: 24, border: `1px solid ${BORDER}`, marginBottom: 24 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: INK, marginBottom: 16 }}>How instant booking works</div>
+          {[
+            { icon: '📋', title: 'Request sent instantly', desc: 'Your consultation request goes to the next available doctor.' },
+            { icon: '📲', title: 'Doctor calls you on WhatsApp', desc: 'No need to pick a slot — the doctor calls as soon as they\'re available, usually within a few hours.' },
+            { icon: '💊', title: 'Prescription on the same day', desc: 'If eligible, you get your prescription and treatment plan right after the call.' },
+          ].map((item, i) => (
+            <div key={i} style={{ display: 'flex', gap: 14, marginBottom: i < 2 ? 18 : 0, alignItems: 'flex-start' }}>
+              <div style={{ fontSize: 22, flexShrink: 0, marginTop: 1 }}>{item.icon}</div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: INK, marginBottom: 3 }}>{item.title}</div>
+                <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.6 }}>{item.desc}</div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Time slots */}
-        {selectedDate && (
-          <div style={{ marginBottom: 32 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a', marginBottom: 16 }}>Select a time (IST)</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
-              {TIME_SLOTS.map(t => {
-                const selected = selectedTime === t
-                return (
-                  <button key={t} onClick={() => setSelectedTime(t)} style={{
-                    padding: '10px 8px', borderRadius: 8, border: '2px solid', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14,
-                    background: selected ? 'var(--brand)' : 'white',
-                    borderColor: selected ? 'var(--brand)' : '#e5e7eb',
-                    color: selected ? 'white' : '#374151',
-                  }}>
-                    {t}
-                  </button>
-                )
-              })}
-            </div>
+        {/* Pricing */}
+        <div style={{ background: GL, border: '1px solid #C0DD97', borderRadius: 14, padding: '16px 20px', marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#3B6D11' }}>Consultation fee</div>
+            <div style={{ fontSize: 12, color: '#639922', marginTop: 2 }}>Full refund if GLP-1 isn't suitable for you</div>
+          </div>
+          <div style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: GD }}>₹799</div>
+        </div>
+
+        {error && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 14, color: '#b91c1c' }}>
+            {error}
           </div>
         )}
 
-        {/* Summary & pay */}
-        {selectedDate && selectedTime && (
-          <div style={{ background: '#f0fdf6', borderRadius: 16, padding: 24, marginBottom: 24, border: '1px solid #bbf7d2' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--brand-dark)', marginBottom: 12 }}>Booking summary</h3>
-            <div style={{ fontSize: 14, color: '#374151', lineHeight: 2 }}>
-              <div>📅 {selectedDate.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
-              <div>🕐 {selectedTime} IST</div>
-              <div>👨‍⚕️ {MVP_DOCTOR.name}</div>
-              <div>💰 ₹799 · Paid via Razorpay</div>
-            </div>
-          </div>
-        )}
-
-        {error && <p style={{ color: '#ef4444', fontSize: 14, marginBottom: 16 }}>{error}</p>}
-
-        <button onClick={handleBook} disabled={booking || !selectedDate || !selectedTime} style={{
-          width: '100%', padding: '16px', background: 'var(--brand)', color: 'white', borderRadius: 12,
-          fontSize: 16, fontWeight: 500, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-          opacity: (!selectedDate || !selectedTime) ? 0.5 : 1,
-        }}>
-          {booking ? 'Processing...' : 'Pay ₹799 & confirm booking →'}
+        <button
+          onClick={handleBook}
+          disabled={booking}
+          style={{
+            width: '100%', padding: '16px', background: booking ? '#86efac' : G,
+            color: 'white', borderRadius: 12, fontSize: 16, fontWeight: 600,
+            border: 'none', cursor: booking ? 'not-allowed' : 'pointer',
+            fontFamily: SANS, transition: 'background 0.2s',
+          }}
+        >
+          {booking ? 'Requesting consultation…' : 'Request consultation — ₹799 →'}
         </button>
-        <p style={{ marginTop: 12, fontSize: 12, color: '#9ca3af', textAlign: 'center' }}>
-          If the doctor decides GLP-1 isn't suitable for you, you get a full refund.
+
+        <p style={{ marginTop: 12, fontSize: 12, color: FAINT, textAlign: 'center', lineHeight: 1.7 }}>
+          By booking you agree to our Terms of Service. Payment collected by the doctor after consultation.
         </p>
       </div>
     </div>
