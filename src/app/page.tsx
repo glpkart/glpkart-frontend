@@ -69,7 +69,7 @@ export default function HomePage() {
       {/* Top bar */}
       <div style={{ background: G, color: 'white', textAlign: 'center', padding: '9px 20px', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
         <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#86efac', display: 'inline-block' }} />
-        Doctors available today in Mumbai &nbsp;Â·&nbsp; GLP-1 consultations on WhatsApp â â¹799
+        Doctors available today in Mumbai &nbsp;·&nbsp; GLP-1 consultations on WhatsApp â â¹799
       </div>
 
       {/* Nav */}
@@ -137,7 +137,7 @@ export default function HomePage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }} className="stat-cards-sub">
               <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '20px 24px' }}>
                 <div style={{ fontSize: 11, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>vs diet alone</div>
-                <div style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: 'white', lineHeight: 1 }}>6Ã</div>
+                <div style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: 'white', lineHeight: 1 }}>6×</div>
                 <div style={{ fontSize: 13, color: FAINT, marginTop: 4 }}>more effective</div>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '20px 24px' }}>
@@ -221,7 +221,7 @@ export default function HomePage() {
                   <span style={{ fontSize: 11, background: 'rgba(74,222,128,0.15)', color: '#4ade80', padding: '4px 12px', borderRadius: 999, fontWeight: 600, border: '1px solid rgba(74,222,128,0.2)' }}>{med.badge}</span>
                 </div>
                 <div style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 4 }}>{med.name}</div>
-                <div style={{ fontSize: 13, color: MUTED, marginBottom: 14 }}>{med.type} Â· Branded & generic available</div>
+                <div style={{ fontSize: 13, color: MUTED, marginBottom: 14 }}>{med.type} · Branded & generic available</div>
                 <div style={{ fontSize: 14, color: FAINT, lineHeight: 1.7, marginBottom: 20 }}>{med.desc}</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {med.feats.map((f, j) => (
@@ -373,13 +373,13 @@ export default function HomePage() {
             Chat on WhatsApp
           </a>
         </div>
-        <p style={{ fontSize: 12, color: '#4b5563', marginTop: 16 }}>Free if not eligible Â· Licensed doctors only Â· DPDPA 2023 compliant</p>
+        <p style={{ fontSize: 12, color: '#4b5563', marginTop: 16 }}>Free if not eligible · Licensed doctors only · DPDPA 2023 compliant</p>
       </div>
 
       {/* Footer */}
       <div style={{ background: '#0a0a0a', padding: '32px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }} className="footer-inner">
         <div style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: 'white' }}>GLP<span style={{ color: G }}>Kart</span></div>
-        <div style={{ fontSize: 12, color: '#4b5563' }}>Â© 2026 Teleswasth Private Limited Â· Mumbai Â· hello@glpkart.com</div>
+        <div style={{ fontSize: 12, color: '#4b5563' }}>© 2026 Teleswasth Private Limited · Mumbai · hello@glpkart.com</div>
         <div style={{ display: 'flex', gap: 16 }}>
           {['Privacy', 'Terms', 'DPDPA'].map(l => <a key={l} href="#" style={{ color: '#4b5563', fontSize: 12, textDecoration: 'none' }}>{l}</a>)}
         </div>
