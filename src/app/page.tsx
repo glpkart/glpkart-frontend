@@ -67,9 +67,15 @@ export default function HomePage() {
       <ResponsiveStyles />
 
       {/* Top bar */}
-      <div style={{ background: G, color: 'white', textAlign: 'center', padding: '9px 20px', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#86efac', display: 'inline-block' }} />
-        Doctors available today in Mumbai &nbsp; · &nbsp; GLP-1 consultations on WhatsApp  --  ₹799
+      <div style={{ background: G, color: 'white', overflow: 'hidden', padding: '9px 0', fontSize: 12, whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'inline-block', animation: 'marquee 30s linear infinite' }}>
+          {[1,2].map(k => (
+            <span key={k} style={{ marginRight: 80 }}>
+              \uD83D\uDC8A Verified GLP-1 Meds &nbsp;\u00B7&nbsp; \uD83E\uDE7A Doctor-Led Care &nbsp;\u00B7&nbsp; \u2744\uFE0F Cold-Chain Delivery &nbsp;\u00B7&nbsp; \uD83E\uDD57 Dietician Support &nbsp;\u00B7&nbsp; \uD83D\uDCCA Weight Tracking &nbsp;\u00B7&nbsp; \uD83D\uDC65 Community Access &nbsp;\u00B7&nbsp; \uD83D\uDD04 Easy Refills &nbsp;\u00B7&nbsp; \u2705 Licensed Doctors Only &nbsp;\u00B7&nbsp; \uD83C\uDDEE\uD83C\uDDF3 Made for India &nbsp;&nbsp;&nbsp;
+            </span>
+          ))}
+        </div>
+        <style>{`@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }`}</style>
       </div>
 
       {/* Nav */}
@@ -141,9 +147,9 @@ export default function HomePage() {
                 <div style={{ fontSize: 13, color: FAINT, marginTop: 4 }}>more effective</div>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '20px 24px' }}>
-                <div style={{ fontSize: 11, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>First consult</div>
-                <div style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1 }}>₹799</div>
-                <div style={{ fontSize: 13, color: FAINT, marginTop: 4 }}>via WhatsApp</div>
+                <div style={{ fontSize: 11, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>DOCTOR-LED</div>
+                <div style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1 }}>100%</div>
+                <div style={{ fontSize: 13, color: FAINT, marginTop: 4 }}>on WhatsApp</div>
               </div>
             </div>
             <div style={{ background: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 14, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -168,6 +174,23 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* Mission */}
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '80px 40px', textAlign: 'center' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: G, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>Our mission</div>
+        <h2 style={{ fontFamily: SERIF, fontSize: 32, fontWeight: 700, color: INK, lineHeight: 1.3, marginBottom: 20 }}>
+          Make world-class metabolic care<br />reachable for every Indian.
+        </h2>
+        <p style={{ fontSize: 16, color: '#4b5563', lineHeight: 1.85, marginBottom: 24, maxWidth: 640, margin: '0 auto 24px' }}>
+          Guided by trusted doctors, backed by genuine medicines, and supported at every step. Because good health is not a privilege  --  it's every Indian's right.
+        </p>
+        <p style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: G, letterSpacing: '0.02em' }}>
+          विश्वास, सेवा, स्वास्थ्य.
+        </p>
+      </div>
+
+      
+
 
       {/* How it works */}
       <div id="how-it-works" style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 40px' }}>
@@ -202,6 +225,37 @@ export default function HomePage() {
           </a>
         </div>
       </div>
+
+
+      {/* GLPKart Package */}
+      <div style={{ background: '#111d11', padding: '80px 40px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: 580, margin: '0 auto 48px' }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>What you get</div>
+            <h2 style={{ fontFamily: SERIF, fontSize: 38, fontWeight: 700, color: 'white', lineHeight: 1.15, marginBottom: 12 }}>The GLPKart Package</h2>
+            <p style={{ fontSize: 15, color: '#9ca3af', lineHeight: 1.7 }}>Everything you need for a safe, guided weight loss journey.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }} className="steps-grid">
+            {[
+              { icon: '\u2705', title: 'Verified Meds', desc: 'Gold-standard quality guaranteed.' },
+              { icon: '\u2744\uFE0F', title: 'Cold-Chain', desc: 'Chilled delivery to your doorstep.' },
+              { icon: '\uD83E\uDE7A', title: 'Expert Care', desc: 'Medical monitoring & guidance.' },
+              { icon: '\uD83E\uDD57', title: 'Dietician Support', desc: 'Personalised nutrition plans.' },
+              { icon: '\uD83D\uDCCA', title: 'Weight Tracker', desc: 'Monitor your transformation.' },
+              { icon: '\uD83D\uDD04', title: 'Easy Refills', desc: 'Zero-friction monthly renewals.' },
+              { icon: '\uD83D\uDC65', title: 'The Tribe', desc: 'Anonymous community access.' },
+              { icon: '\uD83D\uDCA7', title: 'Wellness Guidance', desc: 'Water reminders + workout tips.' },
+            ].map((item, i) => (
+              <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '24px 20px', textAlign: 'center' }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>{item.icon}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'white', marginBottom: 6 }}>{item.title}</div>
+                <div style={{ fontSize: 13, color: '#9ca3af', lineHeight: 1.5 }}>{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
 
       {/* Medication */}
       <div id="medication" style={{ background: DARK2, padding: '80px 40px' }}>
@@ -305,20 +359,6 @@ export default function HomePage() {
       </div>
 
 
-      {/* Mission */}
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '80px 40px', textAlign: 'center' }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: G, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>Our mission</div>
-        <h2 style={{ fontFamily: SERIF, fontSize: 32, fontWeight: 700, color: INK, lineHeight: 1.3, marginBottom: 20 }}>
-          Make world-class metabolic care<br />reachable for every Indian.
-        </h2>
-        <p style={{ fontSize: 16, color: '#4b5563', lineHeight: 1.85, marginBottom: 24, maxWidth: 640, margin: '0 auto 24px' }}>
-          Guided by trusted doctors, backed by genuine medicines, and supported at every step. Because good health is not a privilege  --  it's every Indian's right.
-        </p>
-        <p style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: G, letterSpacing: '0.02em' }}>
-          विश्वास, सेवा, स्वास्थ्य.
-        </p>
-      </div>
-
       {/* WhatsApp CTA section  --  replaces community sign-in wall */}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 40px' }}>
         <div style={{ background: DARK, borderRadius: 24, padding: '60px 48px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'center' }} className="cta-grid">
@@ -327,7 +367,7 @@ export default function HomePage() {
             <h2 style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: 'white', lineHeight: 1.15, marginBottom: 14 }}>Start your journey<br />on WhatsApp.</h2>
             <p style={{ fontSize: 15, color: FAINT, lineHeight: 1.75, maxWidth: 440 }}>Check your eligibility on this page, then message us on WhatsApp. No login, no forms, no app download. A doctor calls you directly.</p>
             <div style={{ marginTop: 24, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              {['No app download', 'Doctor calls you', '₹799 consultation'].map((f, i) => (
+              {['No app download', 'Doctor calls you', '100% consultation'].map((f, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: MUTED }}>
                   <span style={{ color: '#4ade80' }}>â</span> {f}
                 </div>

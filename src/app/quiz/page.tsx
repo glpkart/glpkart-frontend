@@ -28,7 +28,7 @@ export default function QuizPage() {
   function submitMulti() { const sel = (answers[q.id] as string[]) || []; if (q.disqualifyAny?.some(d => sel.includes(d))) { setResult('ineligible'); return }; if (step < QUESTIONS.length - 1) setStep(step + 1); else setResult('eligible') }
   function submitBMI() { const bmi = calcBMI(); if (bmi < 27.5) { setResult('ineligible'); return }; setAnswers({ ...answers, height_cm: heightCm, weight_kg: weightKg, bmi: bmi.toFixed(1) }); setStep(step + 1) }
   const bmi = calcBMI()
-  const waText = encodeURIComponent(`Hi, I completed the GLPKart eligibility quiz and I appear to be eligible.\n\nBMI: ${answers.bmi || bmi.toFixed(1)}\nGoal: ${answers.goal || 'Not specified'}\n\nI'd like to book a consultation.`)
+  const waText = encodeURIComponent('Hi, I completed the GLPKart eligibility quiz and I appear to be eligible.')}\nGoal: ${answers.goal || 'Not specified'}\n\nI'd like to book a consultation.`)
   const waLink = `https://wa.me/${WA_NUMBER}?text=${waText}`
   const cs: React.CSSProperties = { minHeight: '100vh', background: '#FAFAF7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', fontFamily: "'DM Sans', sans-serif" }
   const card: React.CSSProperties = { background: 'white', borderRadius: 20, padding: 40, border: '1px solid #e5e7eb', width: '100%' }
@@ -52,8 +52,8 @@ export default function QuizPage() {
       <p style={ss}>Based on your responses, GLP-1 therapy may be suitable for you. The next step is a quick chat on WhatsApp to book your consultation.</p>
       <div style={{ background: '#f0fdf6', borderRadius: 12, padding: 20, margin: '24px 0', fontSize: 14, color: '#374151', lineHeight: 1.7 }}>
         <strong style={{ color: '#14532b' }}>Your BMI: {Number(answers.bmi || bmi.toFixed(1))}</strong><br />
-        Consultation: ₹799 · WhatsApp call · Licensed endocrinologist<br />
-        <span style={{ fontSize: 12, color: '#6b7280' }}>Full refund if GLP-1 isn't right for you</span>
+        
+        
       </div>
       <a href={waLink} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: '16px 24px', background: '#25D366', color: 'white', borderRadius: 12, fontSize: 16, fontWeight: 600, textDecoration: 'none', fontFamily: "'DM Sans', sans-serif", boxSizing: 'border-box' }}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.013.497 3.908 1.371 5.572L0 24l6.621-1.339A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.369l-.359-.214-3.728.755.784-3.627-.234-.372A9.818 9.818 0 1112 21.818z"/></svg>
