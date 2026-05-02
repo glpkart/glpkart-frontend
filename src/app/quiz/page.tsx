@@ -28,7 +28,7 @@ export default function QuizPage() {
   function submitMulti() { const sel = (answers[q.id] as string[]) || []; if (q.disqualifyAny?.some(d => sel.includes(d))) { setResult('ineligible'); return }; if (step < QUESTIONS.length - 1) setStep(step + 1); else setResult('eligible') }
   function submitBMI() { const bmi = calcBMI(); if (bmi < 27.5) { setResult('ineligible'); return }; setAnswers({ ...answers, height_cm: heightCm, weight_kg: weightKg, bmi: bmi.toFixed(1) }); setStep(step + 1) }
   const bmi = calcBMI()
-  const waText = encodeURIComponent('Hi, I completed the GLPKart eligibility quiz and I appear to be eligible.')}\nGoal: ${answers.goal || 'Not specified'}\n\nI'd like to book a consultation.`)
+  const waText = encodeURIComponent('Hi, I completed the GLPKart eligibility quiz and I appear to be eligible.')
   const waLink = `https://wa.me/${WA_NUMBER}?text=${waText}`
   const cs: React.CSSProperties = { minHeight: '100vh', background: '#FAFAF7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', fontFamily: "'DM Sans', sans-serif" }
   const card: React.CSSProperties = { background: 'white', borderRadius: 20, padding: 40, border: '1px solid #e5e7eb', width: '100%' }
