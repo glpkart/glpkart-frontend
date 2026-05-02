@@ -39,6 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           fbq('init', '954737590749797');
           fbq('track', 'PageView');`}
         </Script>
+        <noscript>
+          <img height="1" width="1" style={{display:'none'}} src="https://www.facebook.com/tr?id=954737590749797&ev=PageView&noscript=1" />
+        </noscript>
         <Script id="clarity" strategy="afterInteractive">
           {`(function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};

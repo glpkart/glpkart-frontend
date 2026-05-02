@@ -18,7 +18,6 @@ const ResponsiveStyles = () => (
       .nav-buttons { gap: 6px !important; }
       .nav-buttons a, .nav-buttons a span { font-size: 12px !important; padding: 7px 12px !important; }
       .footer-inner { flex-direction: column !important; text-align: center !important; gap: 16px !important; }
-      .mission-text { font-size: 15px !important; }
     }
     @media (max-width: 480px) {
       .trust-grid { grid-template-columns: 1fr !important; }
@@ -65,13 +64,12 @@ export default function HomePage() {
 
   return (
     <div style={{ minHeight: '100vh', background: CREAM, fontFamily: SANS, color: INK, overflowX: 'hidden' }}>
-      
       <ResponsiveStyles />
 
       {/* Top bar */}
       <div style={{ background: G, color: 'white', textAlign: 'center', padding: '9px 20px', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
         <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#86efac', display: 'inline-block' }} />
-        Doctors available today in Mumbai &nbsp; ÃÂ· &nbsp; GLP-1 consultations on WhatsApp  --  Ã¢ÂÂ¹799
+        Doctors available today in Mumbai &nbsp; · &nbsp; GLP-1 consultations on WhatsApp  --  ₹799
       </div>
 
       {/* Nav */}
@@ -139,12 +137,12 @@ export default function HomePage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }} className="stat-cards-sub">
               <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '20px 24px' }}>
                 <div style={{ fontSize: 11, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>vs diet alone</div>
-                <div style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: 'white', lineHeight: 1 }}>6xÃÂ</div>
+                <div style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: 'white', lineHeight: 1 }}>6x</div>
                 <div style={{ fontSize: 13, color: FAINT, marginTop: 4 }}>more effective</div>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '20px 24px' }}>
                 <div style={{ fontSize: 11, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>First consult</div>
-                <div style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1 }}>Ã¢ÂÂ¹799</div>
+                <div style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1 }}>₹799</div>
                 <div style={{ fontSize: 13, color: FAINT, marginTop: 4 }}>via WhatsApp</div>
               </div>
             </div>
@@ -196,7 +194,7 @@ export default function HomePage() {
         </div>
         <div style={{ marginTop: 40, textAlign: 'center', display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
           <Link href="/quiz" style={{ display: 'inline-flex', padding: '14px 32px', borderRadius: 10, fontSize: 15, fontWeight: 600, background: G, color: 'white', textDecoration: 'none' }}>
-            Check eligibility  --  free Ã¢ÂÂ
+            Check eligibility  --  free →
           </Link>
           <a href={WA_LINK} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px', borderRadius: 10, fontSize: 15, fontWeight: 600, background: '#25D366', color: 'white', textDecoration: 'none' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.013.497 3.908 1.371 5.572L0 24l6.621-1.339A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.369l-.359-.214-3.728.755.784-3.627-.234-.372A9.818 9.818 0 1112 21.818z"/></svg>
@@ -212,8 +210,8 @@ export default function HomePage() {
           <h2 style={{ fontFamily: SERIF, fontSize: 38, fontWeight: 700, color: 'white', marginBottom: 48, lineHeight: 1.15 }}>Licensed GLP-1 medication.<br />Branded and generic options.</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }} className="meds-grid">
             {[
-              { name: 'Semaglutide', type: 'GLP-1 receptor agonist', badge: 'Weekly injection', desc: 'The most studied GLP-1 medication for weight loss. Average 15-18% body weight reduction in clinical trials. Available in branded and generic forms.', feats: ['Once weekly', '0.25mg Ã¢ÂÂ 2.4mg', 'Subcutaneous', 'Prescription only'] },
-              { name: 'Tirzepatide', type: 'GLP-1 + GIP dual agonist', badge: 'Dual-action', desc: 'Targets two hunger hormones simultaneously. Newer mechanism showing 20-22% weight reduction  --  the highest of any currently approved medication. Available in branded and generic forms.', feats: ['Once weekly', '2.5mg Ã¢ÂÂ 15mg', 'Subcutaneous', 'Prescription only'] },
+              { name: 'Semaglutide', type: 'GLP-1 receptor agonist', badge: 'Weekly injection', desc: 'The most studied GLP-1 medication for weight loss. Average 15-18% body weight reduction in clinical trials. Available in branded and generic forms.', feats: ['Once weekly', '0.25mg → 2.4mg', 'Subcutaneous', 'Prescription only'] },
+              { name: 'Tirzepatide', type: 'GLP-1 + GIP dual agonist', badge: 'Dual-action', desc: 'Targets two hunger hormones simultaneously. Newer mechanism showing 20-22% weight reduction  --  the highest of any currently approved medication. Available in branded and generic forms.', feats: ['Once weekly', '2.5mg → 15mg', 'Subcutaneous', 'Prescription only'] },
             ].map((med, i) => (
               <div key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: 32 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
@@ -223,7 +221,7 @@ export default function HomePage() {
                   <span style={{ fontSize: 11, background: 'rgba(74,222,128,0.15)', color: '#4ade80', padding: '4px 12px', borderRadius: 999, fontWeight: 600, border: '1px solid rgba(74,222,128,0.2)' }}>{med.badge}</span>
                 </div>
                 <div style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 4 }}>{med.name}</div>
-                <div style={{ fontSize: 13, color: MUTED, marginBottom: 14 }}>{med.type}  ÃÂ·  Branded & generic available</div>
+                <div style={{ fontSize: 13, color: MUTED, marginBottom: 14 }}>{med.type}  ·  Branded & generic available</div>
                 <div style={{ fontSize: 14, color: FAINT, lineHeight: 1.7, marginBottom: 20 }}>{med.desc}</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {med.feats.map((f, j) => (
@@ -317,22 +315,7 @@ export default function HomePage() {
           Guided by trusted doctors, backed by genuine medicines, and supported at every step. Because good health is not a privilege  --  it's every Indian's right.
         </p>
         <p style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: G, letterSpacing: '0.02em' }}>
-          Ã Â¤ÂµÃ Â¤Â¿Ã Â¤Â¶Ã Â¥ÂÃ Â¤ÂµÃ Â¤Â¾Ã Â¤Â¸, Ã Â¤Â¸Ã Â¥ÂÃ Â¤ÂµÃ Â¤Â¾, Ã Â¤Â¸Ã Â¥ÂÃ Â¤ÂµÃ Â¤Â¾Ã Â¤Â¸Ã Â¥ÂÃ Â¤Â¥Ã Â¥ÂÃ Â¤Â¯.
-        </p>
-      </div>
-
-
-      {/* Mission */}
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '80px 40px', textAlign: 'center' }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: G, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>Our mission</div>
-        <h2 style={{ fontFamily: SERIF, fontSize: 32, fontWeight: 700, color: INK, lineHeight: 1.3, marginBottom: 20 }}>
-          Make world-class metabolic care<br />reachable for every Indian.
-        </h2>
-        <p className="mission-text" style={{ fontSize: 16, color: '#4b5563', lineHeight: 1.85, maxWidth: 640, margin: '0 auto 24px' }}>
-          Guided by trusted doctors, backed by genuine medicines, and supported at every step. Because good health is not a privilege â it's every Indian's right.
-        </p>
-        <p style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: G, letterSpacing: '0.02em' }}>
-          à¤µà¤¿à¤¶à¥à¤µà¤¾à¤¸, à¤¸à¥à¤µà¤¾, à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯.
+          विश्वास, सेवा, स्वास्थ्य.
         </p>
       </div>
 
@@ -344,16 +327,16 @@ export default function HomePage() {
             <h2 style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 700, color: 'white', lineHeight: 1.15, marginBottom: 14 }}>Start your journey<br />on WhatsApp.</h2>
             <p style={{ fontSize: 15, color: FAINT, lineHeight: 1.75, maxWidth: 440 }}>Check your eligibility on this page, then message us on WhatsApp. No login, no forms, no app download. A doctor calls you directly.</p>
             <div style={{ marginTop: 24, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              {['No app download', 'Doctor calls you', 'Ã¢ÂÂ¹799 consultation'].map((f, i) => (
+              {['No app download', 'Doctor calls you', '₹799 consultation'].map((f, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: MUTED }}>
-                  <span style={{ color: '#4ade80' }}>ÃÂ¢ÃÂÃÂ</span> {f}
+                  <span style={{ color: '#4ade80' }}>â</span> {f}
                 </div>
               ))}
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 220 }}>
             <Link href="/quiz" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '14px 28px', borderRadius: 10, fontSize: 14, fontWeight: 600, background: G, color: 'white', textDecoration: 'none' }}>
-              Check eligibility Ã¢ÂÂ
+              Check eligibility →
             </Link>
             <a href={WA_LINK} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 28px', borderRadius: 10, fontSize: 14, fontWeight: 600, background: '#25D366', color: 'white', textDecoration: 'none' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.013.497 3.908 1.371 5.572L0 24l6.621-1.339A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.369l-.359-.214-3.728.755.784-3.627-.234-.372A9.818 9.818 0 1112 21.818z"/></svg>
@@ -383,20 +366,20 @@ export default function HomePage() {
         <p style={{ fontSize: 16, color: FAINT, marginBottom: 40, lineHeight: 1.75 }}>Check eligibility in 3 minutes. Then message us on WhatsApp  --  a doctor calls you.</p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/quiz" style={{ display: 'inline-flex', padding: '16px 40px', borderRadius: 12, fontSize: 16, fontWeight: 600, background: G, color: 'white', textDecoration: 'none' }}>
-            Check eligibility  --  free Ã¢ÂÂ
+            Check eligibility  --  free →
           </Link>
           <a href={WA_LINK} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '16px 36px', borderRadius: 12, fontSize: 16, fontWeight: 600, background: '#25D366', color: 'white', textDecoration: 'none' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.013.497 3.908 1.371 5.572L0 24l6.621-1.339A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.369l-.359-.214-3.728.755.784-3.627-.234-.372A9.818 9.818 0 1112 21.818z"/></svg>
             Chat on WhatsApp
           </a>
         </div>
-        <p style={{ fontSize: 12, color: '#4b5563', marginTop: 16 }}>Free if not eligible  ÃÂ·  Licensed doctors only  ÃÂ·  DPDPA 2023 compliant</p>
+        <p style={{ fontSize: 12, color: '#4b5563', marginTop: 16 }}>Free if not eligible  ·  Licensed doctors only  ·  DPDPA 2023 compliant</p>
       </div>
 
       {/* Footer */}
       <div style={{ background: '#0a0a0a', padding: '32px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }} className="footer-inner">
         <div style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: 'white' }}>GLP<span style={{ color: G }}>Kart</span></div>
-        <div style={{ fontSize: 12, color: '#4b5563' }}>ÃÂ© 2026 Teleswasth Private Limited  ÃÂ·  Mumbai  ÃÂ·  hello@glpkart.com</div>
+        <div style={{ fontSize: 12, color: '#4b5563' }}>© 2026 Teleswasth Private Limited  ·  Mumbai  ·  hello@glpkart.com</div>
         <div style={{ display: 'flex', gap: 16 }}>
           {['Privacy', 'Terms', 'DPDPA'].map(l => <a key={l} href="#" style={{ color: '#4b5563', fontSize: 12, textDecoration: 'none' }}>{l}</a>)}
         </div>
